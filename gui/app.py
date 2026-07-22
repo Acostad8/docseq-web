@@ -1,5 +1,6 @@
 import threading
 import os
+import datetime
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
 
@@ -28,6 +29,35 @@ class App(ctk.CTk):
 
         self._build_ui()
         self._log("Selecciona un archivo .docx para comenzar.")
+        self._bind_drop()
+        self.bind("<Control-o>", lambda e: self._browse_file())
+        self.bind("<Control-O>", lambda e: self._browse_file())
+
+    def _ts(self):
+        return datetime.datetime.now().strftime("%H:%M:%S")
+
+    def _format_size(self, path):
+        size = os.path.getsize(path)
+        if size < 1024: return f"{size} B"
+        if size < 1048576: return f"{size/1024:.1f} KB"
+        return f"{size/1048576:.1f} MB"
+
+    def _bind_drop(self):
+        self.drop_target_register = None
+        try:
+            self.tk.eval("package require tkdnd 2.0")
+            self.tk.eval(f"tkdnd::drop_target register {self._w} {['{TKNDD:DND,FILES}']}")
+            self.tk.createcommand("::tkdnd::Drop", self._on_drop)
+        except:
+            pass
+
+    def _on_drop(self, *args):
+        if args and args[0]:
+            ruta = args[0][0]
+            if ruta.endswith(".docx"):
+                self.ruta_entrada.set(ruta)
+                self._log(f"Archivo seleccionado: {ruta}")
+                self._log(f"  Tamaño: {self._format_size(ruta)}")
 
     def _build_ui(self):
         self.grid_columnconfigure(0, weight=1)
@@ -79,21 +109,34 @@ class App(ctk.CTk):
         )
         self.btn_browse.grid(row=1, column=2, padx=(4, self.PAD), pady=4)
 
+        self.file_size_label = ctk.CTkLabel(
+            card_file, text="", font=ctk.CTkFont(size=11),
+            text_color=("gray50", "gray50")
+        )
+        self.file_size_label.grid(row=2, column=0, columnspan=3,
+                                  padx=self.PAD, pady=(0, self.PAD), sticky="w")
+        self.file_size_label.grid_remove()
+
         # ── Card: Acciones ─────────────────────────────────────────
         card_actions = ctk.CTkFrame(self, corner_radius=8)
         card_actions.grid(row=2, column=0, padx=self.PAD, pady=self.PAD,
                           sticky="nsew")
         card_actions.grid_columnconfigure(0, weight=1)
-        card_actions.grid_rowconfigure(2, weight=1)
+        card_actions.grid_rowconfigure(3, weight=1)
+
+        # ── Encabezado Acciones ─────────────────────────────────────
+        acciones_header = ctk.CTkFrame(card_actions, fg_color="transparent")
+        acciones_header.grid(row=0, column=0, padx=self.PAD, pady=(self.PAD, 0), sticky="ew")
+        acciones_header.grid_columnconfigure(0, weight=1)
 
         ctk.CTkLabel(
-            card_actions, text="Acciones",
+            acciones_header, text="Acciones",
             font=ctk.CTkFont(size=13, weight="bold")
-        ).grid(row=0, column=0, padx=self.PAD, pady=(self.PAD, 4), sticky="w")
+        ).grid(row=0, column=0, sticky="w")
 
         # ── Botones principales ────────────────────────────────────
         btn_frame = ctk.CTkFrame(card_actions, fg_color="transparent")
-        btn_frame.grid(row=1, column=0, padx=self.PAD, pady=(0, 8), sticky="ew")
+        btn_frame.grid(row=1, column=0, padx=self.PAD, pady=(8, 0), sticky="ew")
         btn_frame.grid_columnconfigure((0, 1, 2, 3), weight=1)
 
         self.btn_paso1 = ctk.CTkButton(
@@ -130,7 +173,7 @@ class App(ctk.CTk):
 
         # ── Botón Procesar Todo ────────────────────────────────────
         sep = ctk.CTkFrame(card_actions, height=1, fg_color=("gray70", "gray40"))
-        sep.grid(row=2, column=0, padx=self.PAD * 2, sticky="ew")
+        sep.grid(row=2, column=0, padx=self.PAD * 2, pady=(8, 0), sticky="ew")
 
         self.btn_todo = ctk.CTkButton(
             card_actions, text="Procesar todo  (Paso 1  →  Paso 2)",
@@ -140,14 +183,28 @@ class App(ctk.CTk):
             hover_color="#145214",
             command=lambda: self._procesar("todo")
         )
-        self.btn_todo.grid(row=3, column=0, padx=self.PAD * 2, pady=(10, self.PAD),
+        self.btn_todo.grid(row=3, column=0, padx=self.PAD * 2, pady=(10, 4),
                            sticky="ew")
 
         # ── Log ────────────────────────────────────────────────────
+        log_header = ctk.CTkFrame(card_actions, fg_color="transparent")
+        log_header.grid(row=4, column=0, padx=self.PAD, pady=(8, 2), sticky="ew")
+        log_header.grid_columnconfigure(0, weight=1)
+
         ctk.CTkLabel(
-            card_actions, text="Resultados",
+            log_header, text="Resultados",
             font=ctk.CTkFont(size=13, weight="bold")
-        ).grid(row=4, column=0, padx=self.PAD, pady=(0, 2), sticky="w")
+        ).grid(row=0, column=0, sticky="w")
+
+        self.btn_clear = ctk.CTkButton(
+            log_header, text="Limpiar", width=70,
+            font=ctk.CTkFont(size=11),
+            fg_color="transparent",
+            text_color=("gray50", "gray60"),
+            hover=False,
+            command=self._limpiar_log
+        )
+        self.btn_clear.grid(row=0, column=1, padx=(4, 0))
 
         self.log_text = ctk.CTkTextbox(
             card_actions, wrap="word",
@@ -156,6 +213,11 @@ class App(ctk.CTk):
         )
         self.log_text.grid(row=5, column=0, padx=self.PAD, pady=(0, self.PAD),
                            sticky="nsew")
+
+        self.log_text.tag_config("error", foreground="#f87171")
+        self.log_text.tag_config("warning", foreground="#fbbf24")
+        self.log_text.tag_config("info", foreground="#4ade80")
+        self.log_text.tag_config("dim", foreground="#555555")
 
         # ── Footer ─────────────────────────────────────────────────
         footer = ctk.CTkFrame(self, corner_radius=0, height=48,
@@ -194,9 +256,22 @@ class App(ctk.CTk):
 
     # ── Helpers ────────────────────────────────────────────────────
 
-    def _log(self, msg):
-        self.log_text.insert("end", msg + "\n")
+    def _log(self, msg, tag=None):
+        ts = self._ts()
+        if tag is None:
+            if msg.startswith("ERROR") or msg.startswith("  [ERROR]") or msg.startswith("  ERROR"):
+                tag = "error"
+            elif msg.startswith("  [ADVERTENCIA]"):
+                tag = "warning"
+            elif msg.startswith("OK") or msg.startswith("  Resumen") or msg.startswith("Archivo guardado"):
+                tag = "info"
+        self.log_text.insert("end", f"{ts} ", "dim")
+        self.log_text.insert("end", msg + "\n", tag) if tag else self.log_text.insert("end", msg + "\n")
         self.log_text.see("end")
+
+    def _limpiar_log(self):
+        self.log_text.delete("1.0", "end")
+        self._log("Log limpiado.")
 
     def _browse_file(self):
         ruta = filedialog.askopenfilename(
@@ -205,6 +280,11 @@ class App(ctk.CTk):
         if ruta:
             self.ruta_entrada.set(ruta)
             self._log(f"Archivo seleccionado: {ruta}")
+            try:
+                self.file_size_label.configure(text=f"Tamaño: {self._format_size(ruta)}")
+                self.file_size_label.grid()
+            except:
+                pass
 
     def _archivo_valido(self):
         ruta = self.ruta_entrada.get().strip()
@@ -303,37 +383,39 @@ class App(ctk.CTk):
 
     def _resultado_numerar(self, res, mostrar_resumen=True):
         if not res.get("success"):
-            self._log(f"  ERROR: {res.get('error', 'Error desconocido')}")
+            self._log(f"  ERROR: {res.get('error', 'Error desconocido')}", "error")
             self.after(0, lambda: self._set_error_status())
             return
         c = res["contadores"]
         if mostrar_resumen:
             self._log("")
-            self._log("  Resumen:")
+            self._log("  Resumen:", "info")
             for tipo, cuenta in c.items():
                 self._log(f"    {tipo}s:  {cuenta}")
             self._log(f"    Modificados:  {res['modificados']}")
             if res["errores"]:
-                self._log(f"    Errores:      {res['errores']}")
+                self._log(f"    Errores:      {res['errores']}", "error")
         self.ruta_salida = res["ruta_salida"]
 
     def _resultado_default(self, res):
         if not res.get("success"):
-            self._log(f"  ERROR: {res.get('error', 'Error desconocido')}")
+            self._log(f"  ERROR: {res.get('error', 'Error desconocido')}", "error")
             self.after(0, lambda: self._set_error_status())
             return
         self.ruta_salida = res.get("ruta_salida")
+        if self.ruta_salida:
+            self._log(f"  Archivo guardado: {self.ruta_salida}", "info")
 
     def _resultado_verificar(self, res):
         if res["success"]:
-            self._log("  Documento OK — sin errores.")
+            self._log("  Documento OK — sin errores.", "info")
         else:
-            self._log(f"  {res['errores_totales']} problema(s) encontrado(s).")
+            self._log(f"  {res['errores_totales']} problema(s) encontrado(s).", "error")
             self.after(0, lambda: self._set_error_status())
         self.ruta_salida = None
 
     def _on_error(self, msg):
-        self._log(f"ERROR: {msg}")
+        self._log(f"ERROR: {msg}", "error")
         self._set_error_status()
         messagebox.showerror("Error", msg)
 
