@@ -57,7 +57,10 @@
       </section>
 
       <section class="card" id="results-card">
-        <h2>Resultados</h2>
+        <div class="results-header">
+          <h2>Resultados</h2>
+          <button class="btn-text btn-clear" id="btn-clear" hidden>Limpiar</button>
+        </div>
         <div class="log-container" id="log">
           <div class="log-empty">Sube un archivo .docx para comenzar.</div>
         </div>
@@ -72,6 +75,7 @@
       <div class="spinner" id="spinner" hidden>
         <div class="bar"></div>
       </div>
+      <span class="step-indicator" id="step-indicator" hidden></span>
       <button class="btn btn-secondary btn-sm" id="btn-download" hidden>
         Descargar resultado
       </button>

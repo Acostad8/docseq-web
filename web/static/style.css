@@ -187,6 +187,25 @@ header h1 {
   margin: 12px 0;
 }
 
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.results-header h2 {
+  margin-bottom: 0;
+}
+
+.btn-clear {
+  font-size: 12px;
+  opacity: .6;
+  transition: opacity .2s;
+}
+.btn-clear:hover {
+  opacity: 1;
+}
+
 .log-container {
   background: #0f0f1a;
   border: 1px solid var(--border);
@@ -200,16 +219,30 @@ header h1 {
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
+  scroll-behavior: smooth;
 }
 .log-empty {
   color: var(--text-secondary);
   font-style: italic;
 }
-.log-line { padding: 1px 0; }
+.log-line {
+  padding: 1px 0;
+  animation: logFadeIn .15s ease-out;
+}
+@keyframes logFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.log-line .ts {
+  color: #555;
+  margin-right: 8px;
+  user-select: none;
+}
 .log-line.error { color: var(--danger); }
 .log-line.warning { color: var(--warning); }
 .log-line.info { color: var(--accent); }
 .log-line.sep { color: var(--text-secondary); opacity: .4; }
+.log-line.sep .ts { color: transparent; }
 
 footer {
   display: flex;
@@ -253,7 +286,37 @@ footer {
   100% { transform: translateX(400%); }
 }
 
+.step-indicator {
+  font-size: 12px;
+  color: var(--warning);
+  white-space: nowrap;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: .6; }
+  50% { opacity: 1; }
+}
+
+.btn-action.active {
+  border-color: var(--accent);
+  background: var(--surface2);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.btn-primary:not(:disabled) {
+  transition: background .15s, transform .1s, box-shadow .2s;
+}
+.btn-primary:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(22, 101, 52, .4);
+}
+.btn-primary:not(:disabled):active {
+  transform: translateY(0);
+}
+
 @media (max-width: 600px) {
   #app { padding: 12px; }
   .actions-grid { grid-template-columns: 1fr; }
+  footer { flex-wrap: wrap; }
+  .spinner { order: 3; width: 100%; }
 }
