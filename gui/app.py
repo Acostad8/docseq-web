@@ -256,29 +256,29 @@ class App(ctk.CTk):
                 if accion == "numerar":
                     safe_log("─" * 48)
                     safe_log("Paso 1 — Numerando ilustraciones y tablas...")
-                    res = numerar(ruta, callback=safe_log)
+                    res = numerar.procesar(ruta, callback=safe_log)
                     self.after(0, lambda: self._resultado_numerar(res))
                 elif accion == "insertar_seq":
                     safe_log("─" * 48)
                     safe_log("Paso 2 — Insertando campos SEQ...")
-                    res = insertar_seq(ruta, callback=safe_log)
+                    res = insertar_seq.procesar(ruta, callback=safe_log)
                     self.after(0, lambda: self._resultado_default(res))
                 elif accion == "renumerar":
                     safe_log("─" * 48)
                     safe_log("Renumerando...")
-                    res = renumerar(ruta, callback=safe_log)
+                    res = renumerar.renumerar(ruta, callback=safe_log)
                     self.after(0, lambda: self._resultado_default(res))
                 elif accion == "verificar":
                     safe_log("─" * 48)
                     safe_log("Verificando...")
-                    res = verificar(ruta, callback=safe_log)
+                    res = verificar.verificar(ruta, callback=safe_log)
                     self.after(0, lambda: self._resultado_verificar(res))
                 elif accion == "todo":
                     safe_log("═" * 48)
                     safe_log("Proceso completo:  Paso 1  →  Paso 2")
                     safe_log("")
                     safe_log("▶ Paso 1 — Numerar")
-                    res1 = numerar(ruta, callback=safe_log)
+                    res1 = numerar.procesar(ruta, callback=safe_log)
                     if not res1.get("success"):
                         safe_log("")
                         safe_log("Paso 1 falló. Se cancela el proceso.")
@@ -288,7 +288,7 @@ class App(ctk.CTk):
                     safe_log("")
                     safe_log("▶ Paso 2 — Insertar SEQ")
                     ruta1 = res1["ruta_salida"]
-                    res2 = insertar_seq(ruta1, callback=safe_log)
+                    res2 = insertar_seq.procesar(ruta1, callback=safe_log)
                     self.after(0, lambda: self._resultado_default(res2))
                     safe_log("")
                     safe_log("Proceso completo finalizado.")

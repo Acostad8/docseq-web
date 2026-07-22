@@ -12,7 +12,7 @@ REQUISITOS
 
 
 ESTRUCTURA DEL PROYECTO
-------------------------
+-----------------------
   docseq.py                         Punto de entrada — lanza la interfaz gráfica
   core/
     numerar.py                      Paso 1 — Asigna números correlativos
@@ -21,12 +21,31 @@ ESTRUCTURA DEL PROYECTO
     renumerar.py                    Utilidad — Recalcula numeración si hubo cambios
   gui/
     app.py                          Interfaz gráfica (CustomTkinter)
+  web/
+    main.py                         Backend web (FastAPI)
+    static/
+      index.html                    Frontend web
+      style.css                     Estilos
+      app.js                        Lógica del frontend
   LEEME.txt                         Este archivo
   requirements.txt                  Dependencias del proyecto
 
   Los scripts originales (numerar_ilustraciones_tablas.py, etc.)
   se mantienen por compatibilidad pero la versión recomendada
   es la interfaz gráfica vía main.py.
+
+
+USO CON PLATAFORMA WEB
+-----------------------
+  python -m uvicorn web.main:app --host 127.0.0.1 --port 8000 --reload
+
+  Abre http://127.0.0.1:8000 en tu navegador. Desde ahí puedes:
+    1. Arrastrar o seleccionar un archivo .docx
+    2. Elegir la acción (Numerar, Insertar SEQ, Renumerar, Verificar, o Procesar Todo)
+    3. Ver los resultados en pantalla
+    4. Descargar el archivo procesado
+
+  La funcionalidad es idéntica a la interfaz gráfica de escritorio.
 
 
 USO CON INTERFAZ GRÁFICA (recomendado)

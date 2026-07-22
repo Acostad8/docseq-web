@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocSeq Web — Numeración automática para Word</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>DocSeq</h1>
+      <p class="subtitle">Numeración de ilustraciones y tablas mediante campos SEQ</p>
+    </header>
+
+    <main>
+      <section class="card" id="file-card">
+        <h2>Documento</h2>
+        <div class="upload-area" id="dropzone">
+          <div class="upload-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <p class="upload-text">Arrastra un archivo .docx aquí o <a href="#" id="browse-link">examina</a></p>
+          <p class="upload-hint">Solo documentos Word (.docx)</p>
+          <input type="file" id="file-input" accept=".docx" hidden>
+        </div>
+        <div class="file-info" id="file-info" hidden>
+          <span class="file-name" id="file-name"></span>
+          <button class="btn-text" id="change-file">Cambiar</button>
+        </div>
+      </section>
+
+      <section class="card" id="actions-card">
+        <h2>Acciones</h2>
+        <div class="actions-grid">
+          <button class="btn btn-action" data-action="numerar" disabled>
+            <span class="btn-num">1</span> Numerar
+          </button>
+          <button class="btn btn-action" data-action="insertar_seq" disabled>
+            <span class="btn-num">2</span> Insertar SEQ
+          </button>
+          <button class="btn btn-action btn-secondary" data-action="renumerar" disabled>
+            Renumerar
+          </button>
+          <button class="btn btn-action btn-secondary" data-action="verificar" disabled>
+            Verificar
+          </button>
+        </div>
+        <div class="separator"></div>
+        <button class="btn btn-primary" id="btn-todo" data-action="todo" disabled>
+          Procesar todo <span class="arrow">→</span> (Paso 1 → Paso 2)
+        </button>
+      </section>
+
+      <section class="card" id="results-card">
+        <h2>Resultados</h2>
+        <div class="log-container" id="log">
+          <div class="log-empty">Sube un archivo .docx para comenzar.</div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="status" id="status">
+        <span class="status-dot" id="status-dot"></span>
+        <span class="status-text" id="status-text">Listo</span>
+      </div>
+      <div class="spinner" id="spinner" hidden>
+        <div class="bar"></div>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="btn-download" hidden>
+        Descargar resultado
+      </button>
+    </footer>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
