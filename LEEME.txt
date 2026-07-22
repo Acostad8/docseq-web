@@ -1,0 +1,128 @@
+================================================================
+  DocSeq — Numeración automática para documentos Word
+  Ilustraciones y Tablas mediante campos SEQ
+================================================================
+
+REQUISITOS
+----------
+  Python 3.8 o superior
+  Instalar dependencias (solo una vez):
+
+      pip install -r requirements.txt
+
+
+ESTRUCTURA DEL PROYECTO
+------------------------
+  docseq.py                         Punto de entrada — lanza la interfaz gráfica
+  core/
+    numerar.py                      Paso 1 — Asigna números correlativos
+    insertar_seq.py                 Paso 2 — Inserta campos SEQ para Word
+    verificar.py                    Utilidad — Detecta errores en la numeración
+    renumerar.py                    Utilidad — Recalcula numeración si hubo cambios
+  gui/
+    app.py                          Interfaz gráfica (CustomTkinter)
+  LEEME.txt                         Este archivo
+  requirements.txt                  Dependencias del proyecto
+
+  Los scripts originales (numerar_ilustraciones_tablas.py, etc.)
+  se mantienen por compatibilidad pero la versión recomendada
+  es la interfaz gráfica vía main.py.
+
+
+USO CON INTERFAZ GRÁFICA (recomendado)
+---------------------------------------
+  python docseq.py
+
+  Se abre una ventana donde puedes:
+    1. Seleccionar un archivo .docx con "Examinar"
+    2. Elegir la acción:
+       • "Paso 1: Numerar"        → reemplaza "#." por números
+       • "Paso 2: Insertar SEQ"   → inserta campos SEQ de Word
+       • "Renumerar"              → reasigna números si hubo cambios
+       • "Verificar"              → detecta errores en la numeración
+       • "Procesar Todo (1→2)"    → ejecuta Paso 1 + Paso 2 seguido
+    3. Los resultados se muestran en la ventana de log
+    4. Botón "Abrir carpeta" para ir directo a los archivos generados
+
+
+FLUJO PRINCIPAL (documento nuevo desde cero)
+---------------------------------------------
+
+Situación: tu documento tiene etiquetas como
+    "Ilustración #. Texto de la imagen"
+    "Tabla #. Historia de usuario 01"
+
+  Desde la interfaz gráfica (> python docseq.py):
+  • Selecciona el documento
+  • Presiona "Procesar Todo (1→2)"
+  • Abre el _final.docx generado en Word
+  • Ctrl+A → F9 para actualizar campos
+  • Referencias → Insertar tabla de ilustraciones
+
+O bien, desde la terminal:
+  > python numerar_ilustraciones_tablas.py mi_documento.docx
+  > python insertar_campos_seq.py mi_documento_numerado.docx
+
+Paso final en Word — generar las tablas:
+  1. Abre el archivo _final.docx
+  2. Ctrl+A (seleccionar todo) → F9 (actualiza campos)
+  3. Referencias → Insertar tabla de ilustraciones
+     Etiqueta de título: "Ilustración" → Aceptar
+  4. Repite con etiqueta "Tabla"
+
+
+FLUJO ALTERNATIVO (documento ya numerado)
+------------------------------------------
+  Si tu documento ya tiene "Ilustración 1.", etc. (sin "#."):
+  Desde la GUI selecciona el archivo y presiona "Paso 2: Insertar SEQ".
+
+
+RENUMERAR (cuando agregas o eliminas contenido)
+------------------------------------------------
+  Desde la GUI: selecciona el archivo y presiona "Renumerar".
+  Genera: documento_renumerado.docx
+  Luego abre en Word y presiona Ctrl+A → F9.
+
+
+VERIFICAR
+----------
+  Desde la GUI: selecciona el archivo y presiona "Verificar".
+  No genera archivo. Muestra en el log:
+    - Totales de ilustraciones y tablas
+    - Saltos en la numeración
+    - Duplicados
+    - Párrafos sin procesar
+
+
+ARCHIVOS GENERADOS
+-------------------
+  Entrada                    Salida
+  ───────────────────────────────────────────────
+  documento.docx         →   documento_numerado.docx
+  documento_numerado.docx→   documento_final.docx
+  documento_final.docx   →   documento_renumerado.docx
+  (verificar no genera archivo)
+
+
+================================================================
+  PREGUNTAS FRECUENTES
+================================================================
+
+¿El script modifica el archivo original?
+  No. Siempre genera un archivo nuevo con sufijo _numerado,
+  _final o _renumerado. El original nunca se toca.
+
+¿Qué pasa si tengo "Ilustración #." mezclado con "Ilustración 5."?
+  El Paso 1 solo procesa los "#." y los numera continuando
+  desde el último número encontrado. Se recomienda correr
+  verificar.py después para detectar inconsistencias.
+
+¿Funciona con Word en línea (Office 365 web)?
+  Los campos SEQ se insertan correctamente, pero la actualización
+  con F9 solo funciona en Word de escritorio (Windows o Mac).
+
+¿Qué versión de Word es compatible?
+  Word 2016, 2019, 2021 y Microsoft 365. El formato de campos
+  SEQ es estándar y compatible con todas estas versiones.
+
+================================================================
