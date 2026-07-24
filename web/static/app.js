@@ -245,31 +245,51 @@ function setAccionesDisabled(val) {
 }
 
 function setProgreso(step, state) {
-  if (state === 'reset') {
-    document.querySelectorAll('.step-node').forEach(s => {
-      s.querySelector('.step-circle').className = 'step-circle';
-    });
-    document.querySelectorAll('.step-line').forEach(l => l.classList.remove('completed'));
-    return;
-  }
-
   for (let i = 1; i <= 3; i++) {
     const node = document.querySelector(`.step-node[data-step="${i}"]`);
     if (!node) continue;
     const circle = node.querySelector('.step-circle');
     const line = document.querySelector(`.step-line[data-from="${i}"]`);
 
+    circle.innerHTML = '<span>' + i + '</span>';
     circle.className = 'step-circle';
-    if (line) line.classList.remove('completed');
+    circle.style.background = '';
+    circle.style.borderColor = '';
+    circle.style.color = '';
+    circle.style.boxShadow = '';
+    if (line) {
+      line.classList.remove('completed');
+      line.style.background = '';
+    }
 
     if (state === 'active' && i === step) {
+      circle.style.borderColor = '#4ade80';
+      circle.style.background = 'rgba(74,222,128,0.12)';
+      circle.style.color = '#4ade80';
+      circle.style.boxShadow = '0 0 0 4px rgba(74,222,128,0.12), 0 0 24px rgba(74,222,128,0.2)';
       circle.classList.add('active');
     } else if (i < step && state === 'active') {
+      circle.innerHTML = '<span>✓</span>';
+      circle.style.background = '#4ade80';
+      circle.style.borderColor = '#4ade80';
+      circle.style.color = '#0a0a14';
+      circle.style.boxShadow = '0 0 0 4px rgba(74,222,128,0.15), 0 0 24px rgba(74,222,128,0.25)';
       circle.classList.add('completed');
-      if (line) line.classList.add('completed');
+      if (line) {
+        line.style.background = '#4ade80';
+        line.classList.add('completed');
+      }
     } else if (i <= step && state === 'completed') {
+      circle.innerHTML = '<span>✓</span>';
+      circle.style.background = '#4ade80';
+      circle.style.borderColor = '#4ade80';
+      circle.style.color = '#0a0a14';
+      circle.style.boxShadow = '0 0 0 4px rgba(74,222,128,0.15), 0 0 24px rgba(74,222,128,0.25)';
       circle.classList.add('completed');
-      if (line) line.classList.add('completed');
+      if (line) {
+        line.style.background = '#4ade80';
+        line.classList.add('completed');
+      }
     }
   }
 }
