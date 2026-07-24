@@ -3,10 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DocSeq Web — Numeración automática para Word</title>
+  <meta name="description" content="DocSeq — Numeración automática de ilustraciones y tablas en documentos Word mediante campos SEQ">
+  <title>DocSeq — Numeración automática para Word</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+  <div id="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
   <div id="app">
     <header>
       <h1>DocSeq</h1>
@@ -14,17 +21,19 @@
     </header>
 
     <main>
-      <section class="card" id="file-card">
+      <section class="card" id="file-card" aria-label="Selección de documento">
         <h2>Documento</h2>
-        <div class="upload-area" id="dropzone">
+        <div class="upload-area" id="dropzone" role="button" tabindex="0" aria-label="Subir archivo .docx">
           <div class="upload-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <line x1="9" y1="15" x2="12" y2="12"/>
+              <line x1="15" y1="15" x2="12" y2="12"/>
             </svg>
           </div>
-          <p class="upload-text">Arrastra un archivo .docx aquí o <a href="#" id="browse-link">examina</a></p>
+          <p class="upload-text">Arrastra un archivo .docx aquí o <a href="#" id="browse-link" role="button">examina</a></p>
           <p class="upload-hint">Solo documentos Word (.docx)</p>
           <input type="file" id="file-input" accept=".docx" hidden>
         </div>
@@ -34,13 +43,13 @@
         </div>
       </section>
 
-      <section class="card" id="actions-card">
+      <section class="card" id="actions-card" aria-label="Acciones de procesamiento">
         <h2>Acciones</h2>
         <div class="actions-grid">
-          <button class="btn btn-action" data-action="numerar" disabled>
+          <button class="btn btn-action" data-action="numerar" disabled aria-label="Paso 1: Numerar">
             <span class="btn-num">1</span> Numerar
           </button>
-          <button class="btn btn-action" data-action="insertar_seq" disabled>
+          <button class="btn btn-action" data-action="insertar_seq" disabled aria-label="Paso 2: Insertar SEQ">
             <span class="btn-num">2</span> Insertar SEQ
           </button>
           <button class="btn btn-action btn-secondary" data-action="renumerar" disabled>
@@ -52,16 +61,16 @@
         </div>
         <div class="separator"></div>
         <button class="btn btn-primary" id="btn-todo" data-action="todo" disabled>
-          Procesar todo <span class="arrow">→</span> (Paso 1 → Paso 2)
+          Procesar todo <span class="arrow">→</span>
         </button>
       </section>
 
-      <section class="card" id="results-card">
+      <section class="card" id="results-card" aria-label="Resultados y registro">
         <div class="results-header">
           <h2>Resultados</h2>
           <button class="btn-text btn-clear" id="btn-clear" hidden>Limpiar</button>
         </div>
-        <div class="log-container" id="log">
+        <div class="log-container" id="log" role="log" aria-live="polite">
           <div class="log-empty">Sube un archivo .docx para comenzar.</div>
         </div>
       </section>
@@ -69,15 +78,20 @@
 
     <footer>
       <div class="status" id="status">
-        <span class="status-dot" id="status-dot"></span>
+        <span class="status-dot" id="status-dot" aria-hidden="true"></span>
         <span class="status-text" id="status-text">Listo</span>
       </div>
-      <div class="spinner" id="spinner" hidden>
+      <div class="spinner" id="spinner" hidden aria-hidden="true">
         <div class="bar"></div>
       </div>
-      <span class="step-indicator" id="step-indicator" hidden></span>
+      <span class="step-indicator" id="step-indicator" hidden aria-live="polite"></span>
       <button class="btn btn-secondary btn-sm" id="btn-download" hidden>
-        Descargar resultado
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Descargar
       </button>
     </footer>
   </div>
