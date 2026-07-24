@@ -17,6 +17,7 @@ const downloadBtn = document.getElementById('btn-download');
 const clearBtn = document.getElementById('btn-clear');
 const actions = document.querySelectorAll('.btn-action');
 const btnTodo = document.getElementById('btn-todo');
+const progressTrack = document.getElementById('progress-track');
 
 const ACCIONES = ['numerar', 'insertar_seq', 'renumerar', 'verificar'];
 const NOMBRES = { numerar: 'Numerar', insertar_seq: 'Insertar SEQ', renumerar: 'Renumerar', verificar: 'Verificar', todo: 'Procesar todo' };
@@ -36,6 +37,7 @@ changeFile.addEventListener('click', () => {
   clearBtn.hidden = true;
   setAccionesDisabled(true);
   limpiarActiva();
+  setProgreso('reset');
   resetLog();
 });
 
@@ -109,6 +111,34 @@ async function subirArchivo(file) {
   }
 }
 
+function accionAFormData(accion) {
+  const form = new FormData();
+  form.append('session_id', sessionId);
+  form.append('accion', accion);
+  return form;
+}
+
+function mostrarLogs(data) {
+  if (data.logs) {
+    data.logs.forEach(msg => {
+      if (msg.startsWith('ERROR') || msg.startsWith('  [ERROR]')) log(msg, 'error');
+      else if (msg.startsWith('  [ADVERTENCIA]')) log(msg, 'warning');
+      else log(msg);
+    });
+  }
+}
+
+async function llamarApi(accion) {
+  const res = await fetch('/api/procesar', {
+    method: 'POST',
+    body: accionAFormData(accion),
+  });
+  const data = await res.json();
+  mostrarLogs(data);
+  if (!data.success) throw new Error(data.error || data.resultado?.error || 'Error desconocido');
+  return data;
+}
+
 async function procesar(accion) {
   if (procesando || !sessionId) return;
   procesando = true;
@@ -124,42 +154,42 @@ async function procesar(accion) {
   stepIndicator.hidden = false;
   stepIndicator.textContent = NOMBRES[accion] + '...';
 
-  const form = new FormData();
-  form.append('session_id', sessionId);
-  form.append('accion', accion);
-
   log(`${'='.repeat(48)}`, 'sep');
   log(`Iniciando: ${NOMBRES[accion]}`);
 
   try {
-    const res = await fetch('/api/procesar', {
-      method: 'POST',
-      body: form,
-    });
-    const data = await res.json();
-
-    if (data.logs) {
-      data.logs.forEach(msg => {
-        if (msg.startsWith('ERROR')) log(msg, 'error');
-        else if (msg.startsWith('  [ERROR]')) log(msg, 'error');
-        else if (msg.startsWith('  [ADVERTENCIA]')) log(msg, 'warning');
-        else log(msg);
-      });
-    }
-
-    if (data.success) {
+    if (accion === 'todo') {
+      setProgreso(1, 'active');
+      const r1 = await llamarApi('numerar');
+      setProgreso(1, 'completed');
+      setProgreso(2, 'active');
+      const r2 = await llamarApi('insertar_seq');
+      setProgreso(2, 'completed');
+      setProgreso(3, 'completed');
+      setStatus('ready', 'Completado');
+      log('Proceso completo finalizado exitosamente.', 'info');
+      downloadBtn.hidden = false;
+    } else if (accion === 'verificar') {
+      setProgreso(3, 'active');
+      const data = await llamarApi(accion);
+      setProgreso(3, 'completed');
+      setStatus('ready', 'Completado');
+      log('Verificación completada.', 'info');
+    } else {
+      const pasos = { numerar: 1, insertar_seq: 2, renumerar: 1 };
+      const p = pasos[accion] || 1;
+      setProgreso(p, 'active');
+      const data = await llamarApi(accion);
+      setProgreso(p, 'completed');
+      setProgreso(3, 'completed');
       setStatus('ready', 'Completado');
       log('Proceso completado exitosamente.', 'info');
-      if (accion !== 'verificar') {
-        downloadBtn.hidden = false;
-      }
-    } else {
-      setStatus('error', 'Error');
-      log(`ERROR: ${data.error || data.resultado?.error || 'Error desconocido'}`, 'error');
+      downloadBtn.hidden = false;
     }
   } catch (e) {
     setStatus('error', 'Error');
-    log(`ERROR de conexión: ${e.message}`, 'error');
+    log(`ERROR: ${e.message}`, 'error');
+    setProgreso('reset');
   } finally {
     procesando = false;
     spinner.hidden = true;
@@ -212,6 +242,38 @@ function setAccionesDisabled(val) {
     document.querySelector(`[data-action="${a}"]`).disabled = val;
   });
   btnTodo.disabled = val;
+}
+
+function setProgreso(step, state) {
+  if (state === 'reset') {
+    progressTrack.hidden = true;
+    document.querySelectorAll('.step-node').forEach(s => {
+      s.querySelector('.step-circle').className = 'step-circle';
+    });
+    document.querySelectorAll('.step-line').forEach(l => l.classList.remove('completed'));
+    return;
+  }
+
+  progressTrack.hidden = false;
+
+  for (let i = 1; i <= 3; i++) {
+    const node = document.querySelector(`.step-node[data-step="${i}"]`);
+    const circle = node.querySelector('.step-circle');
+    const line = document.querySelector(`.step-line[data-from="${i}"]`);
+
+    circle.className = 'step-circle';
+    if (line) line.classList.remove('completed');
+
+    if (state === 'active' && i === step) {
+      circle.classList.add('active');
+    } else if (i < step && state === 'active') {
+      circle.classList.add('completed');
+      if (line) line.classList.add('completed');
+    } else if (i <= step && state === 'completed') {
+      circle.classList.add('completed');
+      if (line) line.classList.add('completed');
+    }
+  }
 }
 
 function setStatus(state, text) {
