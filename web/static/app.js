@@ -246,15 +246,12 @@ function setAccionesDisabled(val) {
 
 function setProgreso(step, state) {
   if (state === 'reset') {
-    progressTrack.classList.add('is-hidden');
     document.querySelectorAll('.step-node').forEach(s => {
       s.querySelector('.step-circle').className = 'step-circle';
     });
     document.querySelectorAll('.step-line').forEach(l => l.classList.remove('completed'));
     return;
   }
-
-  progressTrack.classList.remove('is-hidden');
 
   for (let i = 1; i <= 3; i++) {
     const node = document.querySelector(`.step-node[data-step="${i}"]`);
