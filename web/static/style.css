@@ -104,7 +104,7 @@ body {
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 28px;
 }
 
 header {
@@ -126,11 +126,17 @@ header h1 {
   letter-spacing: 0.2px;
 }
 
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 22px 24px;
+  padding: 26px 28px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: var(--shadow-sm);
@@ -381,8 +387,14 @@ header h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 0 2px;
-  animation: fadeSlideIn .35s ease-out;
+  padding: 12px 0 6px;
+  opacity: 1;
+  transition: opacity .35s ease-out;
+}
+.progress-track.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
 }
 
 .step-node {
@@ -668,7 +680,7 @@ footer {
 
 @media (max-width: 600px) {
   #app { padding: 16px 14px; gap: 16px; }
-  .card { padding: 18px; }
+  .card { padding: 20px; }
   .actions-grid { grid-template-columns: 1fr; }
   footer { flex-wrap: wrap; gap: 10px; }
   .spinner { max-width: none; width: 100%; order: 3; }
