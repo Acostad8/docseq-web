@@ -95,14 +95,20 @@ async def procesar(session_id: str = Form(...), accion: str = Form(...)):
 
         elif accion == "insertar_seq":
             cb("Paso 2 — Insertando campos SEQ...")
-            res = core.insertar_seq.procesar(ruta_base, callback=cb)
+            entrada_seq = session_dir / "resultado.docx"
+            if not entrada_seq.exists():
+                entrada_seq = original
+            res = core.insertar_seq.procesar(str(entrada_seq), callback=cb)
             if res.get("ruta_salida"):
                 shutil.copy(res["ruta_salida"], session_dir / "resultado.docx")
             return {"success": res["success"], "resultado": res, "logs": logs[session_id]}
 
         elif accion == "renumerar":
             cb("Renumerando...")
-            res = core.renumerar.renumerar(ruta_base, callback=cb)
+            entrada_ren = session_dir / "resultado.docx"
+            if not entrada_ren.exists():
+                entrada_ren = original
+            res = core.renumerar.renumerar(str(entrada_ren), callback=cb)
             if res.get("ruta_salida"):
                 shutil.copy(res["ruta_salida"], session_dir / "resultado.docx")
             return {"success": res["success"], "resultado": res, "logs": logs[session_id]}

@@ -244,20 +244,10 @@ function setAccionesDisabled(val) {
   btnTodo.disabled = val;
 }
 
-function setProgreso(step, state) {
-  if (state === 'reset') {
-    progressTrack.hidden = true;
-    document.querySelectorAll('.step-node').forEach(s => {
-      s.querySelector('.step-circle').className = 'step-circle';
-    });
-    document.querySelectorAll('.step-line').forEach(l => l.classList.remove('completed'));
-    return;
-  }
-
-  progressTrack.hidden = false;
-
+function aplicarEstadoProgreso(step, state) {
   for (let i = 1; i <= 3; i++) {
     const node = document.querySelector(`.step-node[data-step="${i}"]`);
+    if (!node) continue;
     const circle = node.querySelector('.step-circle');
     const line = document.querySelector(`.step-line[data-from="${i}"]`);
 
@@ -273,6 +263,26 @@ function setProgreso(step, state) {
       circle.classList.add('completed');
       if (line) line.classList.add('completed');
     }
+  }
+}
+
+function setProgreso(step, state) {
+  if (state === 'reset') {
+    progressTrack.hidden = true;
+    document.querySelectorAll('.step-node').forEach(s => {
+      s.querySelector('.step-circle').className = 'step-circle';
+    });
+    document.querySelectorAll('.step-line').forEach(l => l.classList.remove('completed'));
+    return;
+  }
+
+  const wasHidden = progressTrack.hidden;
+  progressTrack.hidden = false;
+
+  if (wasHidden) {
+    requestAnimationFrame(() => requestAnimationFrame(() => aplicarEstadoProgreso(step, state)));
+  } else {
+    aplicarEstadoProgreso(step, state);
   }
 }
 
