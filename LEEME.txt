@@ -1,7 +1,9 @@
 ================================================================
-  DocSeq — Numeración automática para documentos Word
+  DocSeq - Numeración automática para documentos Word
   Ilustraciones y Tablas mediante campos SEQ
 ================================================================
+
+  Versión 1.0.0
 
 REQUISITOS
 ----------
