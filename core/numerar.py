@@ -71,9 +71,7 @@ def procesar(ruta_entrada, callback=None):
     if callback:
         for tipo, cuenta in contadores.items():
             callback(f"  {tipo}s: {cuenta}")
-
-    if callback:
-        callback("Aplicando numeracion y estilos...")
+        callback("Aplicando numeración y estilos...")
 
     errores = 0
     for paragraph in pendientes:
