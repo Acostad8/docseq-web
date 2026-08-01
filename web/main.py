@@ -28,7 +28,7 @@ async def lifespan(app: FastAPI):
     for d in UPLOAD_DIR.iterdir():
         if d.is_dir():
             try:
-                if now - d.stat().st_ctime > 3600:
+                if now - d.stat().st_mtime > 3600:
                     shutil.rmtree(d, ignore_errors=True)
             except:
                 pass
