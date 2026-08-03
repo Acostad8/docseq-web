@@ -18,9 +18,29 @@ const clearBtn = document.getElementById('btn-clear');
 const actions = document.querySelectorAll('.btn-action');
 const btnTodo = document.getElementById('btn-todo');
 const progressTrack = document.getElementById('progress-track');
+const themeToggle = document.getElementById('theme-toggle');
 
 const ACCIONES = ['numerar', 'insertar_seq', 'renumerar', 'verificar'];
 const NOMBRES = { numerar: 'Numerar', insertar_seq: 'Insertar SEQ', renumerar: 'Renumerar', verificar: 'Verificar', todo: 'Procesar todo' };
+
+function aplicarTema(tema) {
+  document.documentElement.setAttribute('data-theme', tema === 'light' ? 'light' : 'dark');
+  try {
+    localStorage.setItem('docseq-theme', tema === 'light' ? 'light' : 'dark');
+  } catch (e) {}
+  if (themeToggle) themeToggle.setAttribute('aria-checked', tema === 'light' ? 'false' : 'true');
+}
+
+themeToggle.addEventListener('click', () => {
+  const actual = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  aplicarTema(actual === 'light' ? 'dark' : 'light');
+});
+
+try {
+  aplicarTema(localStorage.getItem('docseq-theme') || 'dark');
+} catch (e) {
+  aplicarTema('dark');
+}
 
 function ts() {
   return new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -81,7 +101,7 @@ function formatSize(bytes) {
 }
 
 async function subirArchivo(file) {
-  if (!file.name.endsWith('.docx')) {
+  if (!file.name.toLowerCase().endsWith('.docx')) {
     log('ERROR: Solo se permiten archivos .docx', 'error');
     return;
   }
@@ -121,7 +141,7 @@ function accionAFormData(accion) {
 function mostrarLogs(data) {
   if (data.logs) {
     data.logs.forEach(msg => {
-      if (msg.startsWith('ERROR') || msg.startsWith('  [ERROR]')) log(msg, 'error');
+      if (msg.startsWith('ERROR') || msg.startsWith('  [ERROR]') || msg.startsWith('  ERROR')) log(msg, 'error');
       else if (msg.startsWith('  [ADVERTENCIA]')) log(msg, 'warning');
       else log(msg);
     });

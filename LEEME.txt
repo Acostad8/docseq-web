@@ -3,7 +3,7 @@
   Ilustraciones y Tablas mediante campos SEQ
 ================================================================
 
-  Versión 1.0.0
+  Versión 1.1.0
 
 REQUISITOS
 ----------

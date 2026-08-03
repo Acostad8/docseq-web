@@ -25,10 +25,35 @@
   --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.2);
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+  --log-bg: rgba(9, 9, 18, 0.7);
+}
+
+html[data-theme="light"] {
+  --bg: #eef1f7;
+  --bg-gradient: linear-gradient(135deg, #eef1f7 0%, #e4ecf7 45%, #dbeafe 100%);
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-hover: rgba(255, 255, 255, 0.95);
+  --surface2: rgba(240, 244, 250, 0.9);
+  --border: rgba(148, 163, 184, 0.45);
+  --border-hover: rgba(74, 222, 128, 0.35);
+  --text: #1e293b;
+  --text-secondary: #5b6b84;
+  --accent: #16a34a;
+  --accent-hover: #15803d;
+  --accent-subtle: rgba(22, 163, 74, 0.1);
+  --danger: #dc2626;
+  --warning: #d97706;
+  --shadow: 0 8px 40px rgba(30, 41, 59, 0.16);
+  --shadow-sm: 0 4px 16px rgba(30, 41, 59, 0.1);
+  --log-bg: rgba(248, 250, 252, 0.9);
 }
 
 html {
   scroll-behavior: smooth;
+  color-scheme: dark;
+}
+html[data-theme="light"] {
+  color-scheme: light;
 }
 
 #bg-orbs {
@@ -109,6 +134,7 @@ body {
 
 header {
   padding: 4px 4px 0;
+  position: relative;
 }
 header h1 {
   font-size: 26px;
@@ -119,11 +145,56 @@ header h1 {
   background-clip: text;
   letter-spacing: -0.3px;
 }
+.version {
+  display: inline-block;
+  vertical-align: 4px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  -webkit-text-fill-color: var(--text-secondary);
+}
 .subtitle {
   color: var(--text-secondary);
   font-size: 13px;
   margin-top: 4px;
   letter-spacing: 0.2px;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color .25s, border-color .25s, background .25s, transform .15s;
+}
+.theme-toggle:hover {
+  color: var(--accent);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+.theme-toggle .icon-moon {
+  display: none;
+}
+html[data-theme="light"] .theme-toggle .icon-moon {
+  display: block;
+}
+html[data-theme="light"] .theme-toggle .icon-sun {
+  display: none;
 }
 
 main {
@@ -517,7 +588,7 @@ main {
 }
 
 .log-container {
-  background: rgba(9, 9, 18, 0.7);
+  background: var(--log-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 14px 18px;

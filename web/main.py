@@ -32,6 +32,9 @@ async def lifespan(app: FastAPI):
                     shutil.rmtree(d, ignore_errors=True)
             except:
                 pass
+    stale = [sid for sid, msgs in list(logs.items()) if not (UPLOAD_DIR / sid).exists()]
+    for sid in stale:
+        logs.pop(sid, None)
     yield
 
 
@@ -54,7 +57,7 @@ def _make_callback(session_id: str):
 
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):
-    if not file.filename.endswith(".docx"):
+    if not (file.filename or "").lower().endswith(".docx"):
         raise HTTPException(400, "Solo archivos .docx")
     session_id = os.urandom(8).hex()
     session_dir = UPLOAD_DIR / session_id

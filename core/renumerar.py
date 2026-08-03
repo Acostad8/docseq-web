@@ -5,6 +5,8 @@ from docx import Document
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
+from core.parrafos import iterar_parrafos
+
 XML_NS = "http://www.w3.org/XML/1998/namespace"
 PATRON = re.compile(
     r"^(Ilustraci\u00f3n|Tabla)\s+\d+\.\s*(.*)", re.IGNORECASE | re.DOTALL
@@ -75,7 +77,7 @@ def renumerar(ruta_entrada, callback=None):
     modificados = 0
     advertencias = []
 
-    for i, p in enumerate(doc.paragraphs):
+    for i, p in enumerate(iterar_parrafos(doc)):
         texto = "".join(r.text for r in p.runs).strip()
 
         if PATRON_HASH.match(texto):

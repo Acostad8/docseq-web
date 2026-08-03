@@ -2,6 +2,8 @@ import re
 import os
 from docx import Document
 
+from core.parrafos import iterar_parrafos
+
 PREFIJOS = {
     "Ilustración": "Título de ilustración",
     "Tabla": "Título de tabla",
@@ -50,7 +52,7 @@ def procesar(ruta_entrada, callback=None):
     if callback:
         callback("Escaneando documento...")
 
-    for paragraph in doc.paragraphs:
+    for paragraph in iterar_parrafos(doc):
         texto = _texto_completo(paragraph)
         m = PATRON.match(texto)
         if m:

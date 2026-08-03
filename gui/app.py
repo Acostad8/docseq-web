@@ -43,21 +43,33 @@ class App(ctk.CTk):
         return f"{size/1048576:.1f} MB"
 
     def _bind_drop(self):
-        self.drop_target_register = None
         try:
             self.tk.eval("package require tkdnd 2.0")
-            self.tk.eval(f"tkdnd::drop_target register {self._w} {['{TKNDD:DND,FILES}']}")
             self.tk.createcommand("::tkdnd::Drop", self._on_drop)
-        except:
+            self.tk.eval(
+                f"tkdnd::drop_target register {self._w} {{TKNDD::FILES}}"
+            )
+        except Exception:
             pass
 
     def _on_drop(self, *args):
-        if args and args[0]:
-            ruta = args[0][0]
-            if ruta.endswith(".docx"):
+        if not args:
+            return
+        datos = args[0]
+        if isinstance(datos, str):
+            try:
+                datos = self.tk.splitlist(datos)
+            except Exception:
+                datos = [datos]
+        if not isinstance(datos, (list, tuple)):
+            datos = [datos]
+        for item in datos:
+            ruta = str(item).strip().strip("{}")
+            if ruta.lower().endswith(".docx") and os.path.exists(ruta):
                 self.ruta_entrada.set(ruta)
                 self._log(f"Archivo seleccionado: {ruta}")
                 self._log(f"  Tamaño: {self._format_size(ruta)}")
+                break
 
     def _build_ui(self):
         self.grid_columnconfigure(0, weight=1)

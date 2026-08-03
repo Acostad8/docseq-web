@@ -1,6 +1,8 @@
 import re
 from docx import Document
 
+from core.parrafos import iterar_parrafos
+
 PATRON_NUMERADO = re.compile(
     r"^(Ilustraci\u00f3n|Tabla)\s+(\d+)\.\s*(.*)", re.IGNORECASE | re.DOTALL
 )
@@ -13,7 +15,7 @@ def verificar(ruta_entrada, callback=None):
     registros = {"Ilustración": [], "Tabla": []}
     huerfanos = []
 
-    for i, p in enumerate(doc.paragraphs):
+    for i, p in enumerate(iterar_parrafos(doc)):
         texto = "".join(r.text for r in p.runs).strip()
 
         if PATRON_SIN_NUM.match(texto):
@@ -71,9 +73,10 @@ def verificar(ruta_entrada, callback=None):
         prev = 0
         saltos = []
         for num, texto, linea in sorted(lista, key=lambda x: x[0]):
-            if num != prev + 1:
+            if num > prev + 1:
                 saltos.append((prev + 1, num - 1, linea))
-            prev = num
+            if num > prev:
+                prev = num
 
         if saltos:
             info["saltos"] = saltos

@@ -6,6 +6,8 @@ from docx import Document
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
+from core.parrafos import iterar_parrafos
+
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 XML_NS = "http://www.w3.org/XML/1998/namespace"
 
@@ -78,7 +80,7 @@ def procesar(ruta_entrada, callback=None):
     doc = Document(ruta_entrada)
     modificados = 0
 
-    for p in doc.paragraphs:
+    for p in iterar_parrafos(doc):
         texto = "".join(r.text for r in p.runs).strip()
         m = PATRON.match(texto)
         if not m:
