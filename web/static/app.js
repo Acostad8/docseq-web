@@ -24,11 +24,14 @@ const ACCIONES = ['numerar', 'insertar_seq', 'renumerar', 'verificar'];
 const NOMBRES = { numerar: 'Numerar', insertar_seq: 'Insertar SEQ', renumerar: 'Renumerar', verificar: 'Verificar', todo: 'Procesar todo' };
 
 function aplicarTema(tema) {
-  document.documentElement.setAttribute('data-theme', tema === 'light' ? 'light' : 'dark');
+  const esClaro = tema === 'light';
+  document.documentElement.setAttribute('data-theme', esClaro ? 'light' : 'dark');
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) metaTheme.setAttribute('content', esClaro ? '#eef1f7' : '#0a0a14');
   try {
-    localStorage.setItem('docseq-theme', tema === 'light' ? 'light' : 'dark');
+    localStorage.setItem('docseq-theme', esClaro ? 'light' : 'dark');
   } catch (e) {}
-  if (themeToggle) themeToggle.setAttribute('aria-checked', tema === 'light' ? 'false' : 'true');
+  if (themeToggle) themeToggle.setAttribute('aria-checked', esClaro ? 'false' : 'true');
 }
 
 themeToggle.addEventListener('click', () => {
