@@ -149,11 +149,17 @@ header {
 header h1 {
   font-size: 26px;
   font-weight: 800;
-  background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+  background: linear-gradient(135deg, #4ade80 0%, #22d3ee 25%, #4ade80 50%, #22d3ee 75%, #4ade80 100%);
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.3px;
+  animation: titleShine 6s ease-in-out infinite;
+}
+@keyframes titleShine {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
 }
 .version {
   display: inline-block;
